@@ -1,0 +1,58 @@
+version: '3'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: ct_zookeeper
+    ports:
+      - "2181:2181"
+    networks :
+      udf_net1 :
+        ipv4_address :  172.18.0.101          
+  kafka:
+    image: wurstmeister/kafka
+    container_name: ct_kafka
+    depends_on: [ zookeeper ]
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 172.18.0.102
+      KAFKA_CREATE_TOPICS: "test:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: 172.18.0.101:2181
+    volumes:
+      - /app/docker/volumes/docker_vol_kafka/docker.sock:/var/run/docker.sock
+    networks :
+      udf_net1 :
+        ipv4_address :  172.18.0.102
+  kafka2:
+    image: wurstmeister/kafka
+    container_name: ct_kafka2
+    depends_on: [ zookeeper ]
+    ports:
+      - "9093:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 172.18.0.103
+      KAFKA_CREATE_TOPICS: "test:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: 172.18.0.101:2181
+    volumes:
+      - /app/docker/volumes/docker_vol_kafka2/docker.sock:/var/run/docker.sock
+    networks :
+      udf_net1 :
+        ipv4_address :  172.18.0.103        
+
+  # redis:
+  #   image: redis
+  #   container_name: ct_redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks :
+  #     udf_net1 :
+  #       ipv4_address :  172.18.0.103  
+networks:
+  udf_net1 :    
+    driver : bridge    
+    ipam:
+      driver : default
+      config :        
+        - subnet : 172.18.0.0/24
+          gateway : 172.18.0.1
+
