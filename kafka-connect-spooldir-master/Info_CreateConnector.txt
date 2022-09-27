@@ -1,0 +1,52 @@
+
+  "name": "SpoolDirLineDelimited_Src",
+  "config": {
+    "name": "SpoolDirLineDelimitedSourceConnectorConnector_0",
+    "connector.class": "com.github.jcustenborder.kafka.connect.spooldir.SpoolDirLineDelimitedSourceConnector",
+    "tasks.max": "1",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "errors.log.enable": true,
+    "errors.log.include.messages": true,
+    "topic": "topic_test",
+    "cleanup.policy": "NONE",
+    "input.path": "/dk_share/kafka_test/src",
+    "error.path": "/dk_share/kafka_test/err",
+    "input.file.pattern": "test.csv"
+  }
+  
+  http://localhost:8083/connector-plugins/
+curl -s -X PUT http://localhost:8083/admin/loggers/org.apache.kafka.connector -H "Content-Type:application/json" -d '{"level": "INFO"}' | jq '.'	
+  curl -i -X PUT -H  "Content-Type:application/json" \
+    http://localhost:8083/connectors/SpoolDirLineDelimited_Src/config \
+    -d '{ "name": "SpoolDirLineDelimited_Src",
+    "connector.class": "com.github.jcustenborder.kafka.connect.spooldir.SpoolDirLineDelimitedSourceConnector",
+    "tasks.max": "1",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "errors.log.enable": true,
+    "errors.log.include.messages": true,
+    "topic": "topic_test",
+    "cleanup.policy": "NONE",
+    "input.path": "/dk_share/kafka_test/src",
+    "error.path": "/dk_share/kafka_test/err",
+    "input.file.pattern": "test.txt",
+    "transforms":"uuid",
+    "transforms.uuid.type": "com.github.cjmatta.kafka.connect.smt.DecodeRecord$Value",
+    "transforms.uuid.split.char": "|",
+    "transforms.uuid.split.fields": "a,b,c"}'
+     
+    
+    
+ ---Dynamic enable log4j for all connector
+ curl -s -X PUT http://localhost:8083/admin/loggers/org.apache.kafka.connect -H "Content-Type:application/json" -d '{"level": "TRACE"}' | jq '.'
+ 
+ curl -s -X PUT http://localhost:8083/admin/loggers/org.apache.kafka.connect.runtime -H "Content-Type:application/json" -d '{"level": "INFO"}' | jq '.'
+ 
+  curl -s -X PUT http://localhost:8083/admin/loggers/om.github.jcustenborder.kafka.connect.spooldir.SpoolDirLineDelimitedSourceTask -H "Content-Type:application/json" -d '{"level": "TRACE"}' | jq '.'
+ 
+---- Copy plugin ----
+cp /kahome/ECLIPSE_WSPACE/kafka-connect-spooldir-master/target/components/packages/jcustenborder-kafka-connect-spooldir-2.0-SNAPSHOT/jcustenborder-kafka-connect-spooldir-2.0-SNAPSHOT/lib/kafka-connect-spooldir-2.0-SNAPSHOT.jar \
+	  /kahome/docker_share/kafka_plugin/jcustenborder-kafka-connect-spooldir-2.0-SNAPSHOT/jcustenborder-kafka-connect-spooldir-2.0-SNAPSHOT/lib/
+
+ 
