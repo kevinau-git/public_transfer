@@ -1,7 +1,0 @@
-target
-*.iml
-.okhttpcache
-ELFTesting.properties
-.checkstyle
-.factorypath
-.idea/
