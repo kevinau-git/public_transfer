@@ -20,3 +20,10 @@ AS SELECT profileId
   FROM MAP_STREAM_TRX
   GROUP BY profileId
   EMIT CHANGES;
+
+----Try select able only return latest value by key
+ Select * from TBL_TRX; 
+ 
+ ----Try print whole topic you can see it change log of key
+ 
+ print 'TOPIC_TBL_TRX' from beginning;
