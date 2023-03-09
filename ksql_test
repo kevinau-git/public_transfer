@@ -1,0 +1,22 @@
+----create stream for input topic
+CREATE or replace STREAM MAP_STREAM_TRX (profileId VARCHAR key, vol double )
+  WITH (kafka_topic='TOPIC_STREAM_TRX', value_format='json', partitions=1);
+  
+
+----test stream by insert value fro ksql
+INSERT INTO MAP_STREAM_TRX (profileId, vol) VALUES ('p1', 1);
+INSERT INTO MAP_STREAM_TRX (profileId, vol) VALUES ('p1', 2);
+INSERT INTO MAP_STREAM_TRX (profileId, vol) VALUES ('p1', 3);
+INSERT INTO MAP_STREAM_TRX (profileId, vol) VALUES ('p1', 4);
+INSERT INTO MAP_STREAM_TRX (profileId, vol) VALUES ('p1', 16);
+
+
+
+----create aggregration table 
+CREATE TABLE TBL_TRX
+WITH (kafka_topic='TOPIC_TBL_TRX', value_format='json', partitions=1)
+AS SELECT profileId
+	,sum(vol) as ttl_vol
+  FROM MAP_STREAM_TRX
+  GROUP BY profileId
+  EMIT CHANGES;
