@@ -10,7 +10,10 @@ class GridLayoutApp:
         self.root.geometry("600x500")
         
         # Configure grid weights for responsive layout
-        for i in range(3):
+        # Column 0: Left frame with radio buttons (fixed width)
+        # Columns 1-3: Main content area (expandable)
+        self.root.columnconfigure(0, weight=0)  # Left frame - fixed width
+        for i in range(1, 4):  # Main content columns
             self.root.columnconfigure(i, weight=1)
         for i in range(5):
             self.root.rowconfigure(i, weight=0)  # Fixed size for input rows
@@ -48,7 +51,38 @@ class GridLayoutApp:
         self.tree.bind("<Button-1>", self.event_handler.on_tree_click)
     
     def create_widgets(self):
-        # Row 1: Info label (spans 3 columns)
+        # Create left frame with radio buttons (spans all rows)
+        self.left_frame = tk.Frame(self.root, bg="lightgray", relief="sunken", bd=2)
+        self.left_frame.grid(row=0, column=0, rowspan=5, sticky="nsew", padx=(2, 5), pady=2)
+        
+        # Configure left frame
+        self.left_frame.columnconfigure(0, weight=0)  # Don't expand horizontally
+        
+        # Left frame title
+        tk.Label(self.left_frame, text="Options", font=("Arial", 8, "bold"), bg="lightgray").grid(row=0, column=0, sticky="nw", pady=(2, 5), padx=2)
+        
+        # Radio button group
+        self.radio_var = tk.StringVar(value="option1")
+        
+        radio_frame = tk.Frame(self.left_frame, bg="lightgray")
+        radio_frame.grid(row=1, column=0, sticky="nw", padx=2)
+        radio_frame.columnconfigure(0, weight=0)
+        
+        # Radio buttons - smaller and compact
+        tk.Radiobutton(radio_frame, text="Option 1", variable=self.radio_var, value="option1", 
+                      bg="lightgray", font=("Arial", 7), command=self.on_radio_change).grid(row=0, column=0, sticky="nw", pady=1)
+        tk.Radiobutton(radio_frame, text="Option 2", variable=self.radio_var, value="option2", 
+                      bg="lightgray", font=("Arial", 7), command=self.on_radio_change).grid(row=1, column=0, sticky="nw", pady=1)
+        tk.Radiobutton(radio_frame, text="Option 3", variable=self.radio_var, value="option3", 
+                      bg="lightgray", font=("Arial", 7), command=self.on_radio_change).grid(row=2, column=0, sticky="nw", pady=1)
+        tk.Radiobutton(radio_frame, text="Option 4", variable=self.radio_var, value="option4", 
+                      bg="lightgray", font=("Arial", 7), command=self.on_radio_change).grid(row=3, column=0, sticky="nw", pady=1)
+        
+        # Set fixed width for left frame
+        self.left_frame.config(width=120)
+        self.left_frame.grid_propagate(False)
+        
+        # Row 1: Info label (spans main content columns)
         self.info_label = tk.Label(
             self.root, 
             text="Grid Layout Application - Enter data and manage records", 
@@ -56,17 +90,17 @@ class GridLayoutApp:
             font=("Arial", 10, "bold"),
             anchor="w"
         )
-        self.info_label.grid(row=0, column=0, columnspan=3, sticky="nsew", padx=2, pady=2)
+        self.info_label.grid(row=0, column=1, columnspan=3, sticky="nsew", padx=2, pady=2)
         
-        # Row 2: Single text input spanning 3 columns
+        # Row 2: Single text input spanning main content columns
         input_frame = tk.Frame(self.root)
-        input_frame.grid(row=1, column=0, columnspan=3, sticky="nsew", padx=2, pady=2)
+        input_frame.grid(row=1, column=1, columnspan=3, sticky="nsew", padx=2, pady=2)
         input_frame.columnconfigure(0, weight=1)
         tk.Label(input_frame, text="Input:", font=("Arial", 9), anchor="w").grid(row=0, column=0, sticky="nw")
         self.main_entry = tk.Entry(input_frame, font=("Arial", 9))
         self.main_entry.grid(row=1, column=0, sticky="nsew")
         
-        # Row 3: Buttons (3 columns)
+        # Row 3: Buttons (main content columns)
         self.submit_btn = tk.Button(
             self.root, 
             text="Submit", 
@@ -74,7 +108,7 @@ class GridLayoutApp:
             fg="white",
             font=("Arial", 9, "bold")
         )
-        self.submit_btn.grid(row=2, column=0, sticky="nsew", padx=2, pady=2)
+        self.submit_btn.grid(row=2, column=1, sticky="nsew", padx=2, pady=2)
         
         self.clean_btn = tk.Button(
             self.root, 
@@ -83,7 +117,7 @@ class GridLayoutApp:
             fg="white",
             font=("Arial", 9, "bold")
         )
-        self.clean_btn.grid(row=2, column=1, sticky="nsew", padx=2, pady=2)
+        self.clean_btn.grid(row=2, column=2, sticky="nsew", padx=2, pady=2)
         
         self.execute_del_btn = tk.Button(
             self.root, 
@@ -92,11 +126,11 @@ class GridLayoutApp:
             fg="white",
             font=("Arial", 9, "bold")
         )
-        self.execute_del_btn.grid(row=2, column=2, sticky="nsew", padx=2, pady=2)
+        self.execute_del_btn.grid(row=2, column=3, sticky="nsew", padx=2, pady=2)
         
-        # Row 4: Treeview (table-like list, spans 3 columns)
+        # Row 4: Treeview (table-like list, spans main content columns)
         self.tree_frame = tk.Frame(self.root)
-        self.tree_frame.grid(row=3, column=0, columnspan=3, sticky="nsew", padx=2, pady=2)
+        self.tree_frame.grid(row=3, column=1, columnspan=3, sticky="nsew", padx=2, pady=2)
         
         # Configure treeview frame for auto-expansion
         self.tree_frame.columnconfigure(0, weight=1)
@@ -119,19 +153,27 @@ class GridLayoutApp:
         self.tree.column("Type", width=80)
         self.tree.column("Timestamp", width=150)
         
-        # Add scrollbars
+        # Add scrollbars - always enabled/visible
         tree_scrolly = ttk.Scrollbar(self.tree_frame, orient="vertical", command=self.tree.yview)
         tree_scrollx = ttk.Scrollbar(self.tree_frame, orient="horizontal", command=self.tree.xview)
         self.tree.configure(yscrollcommand=tree_scrolly.set, xscrollcommand=tree_scrollx.set)
         
-        # Pack treeview and scrollbars
+        # Configure tree frame grid to always show scrollbars
+        self.tree_frame.columnconfigure(1, weight=0)  # Scrollbar column - fixed
+        self.tree_frame.rowconfigure(1, weight=0)     # Scrollbar row - fixed
+        
+        # Pack treeview and scrollbars - always visible
         self.tree.grid(row=0, column=0, sticky="nsew")
         tree_scrolly.grid(row=0, column=1, sticky="ns")
         tree_scrollx.grid(row=1, column=0, sticky="ew")
         
-        # Row 5: Console textarea (spans 3 columns)
+        # Force scrollbars to always appear by configuring minimum grid sizes
+        self.tree_frame.grid_columnconfigure(1, minsize=15)  # Minimum width for vertical scrollbar
+        self.tree_frame.grid_rowconfigure(1, minsize=15)     # Minimum height for horizontal scrollbar
+        
+        # Row 5: Console textarea (spans main content columns)
         self.console_frame = tk.Frame(self.root)
-        self.console_frame.grid(row=4, column=0, columnspan=3, sticky="nsew", padx=2, pady=2)
+        self.console_frame.grid(row=4, column=1, columnspan=3, sticky="nsew", padx=2, pady=2)
         
         # Configure console frame for auto-expansion
         self.console_frame.columnconfigure(0, weight=1)
@@ -161,6 +203,11 @@ class GridLayoutApp:
         self.add_sample_data()
         self.log_to_console("Application started successfully")
     
+    def on_radio_change(self):
+        """Handle radio button selection changes"""
+        selected_option = self.radio_var.get()
+        self.log_to_console(f"Radio selection changed to: {selected_option}")
+    
     def create_menu(self):
         """Create menu bar with submenus"""
         # Create menu bar
@@ -183,8 +230,10 @@ class GridLayoutApp:
         """Add some sample data to the treeview"""
         sample_data = [
             ("☐", "Sample1", "Value1", "String", "2026-02-26 10:00:00"),
-            ("☐", "Sample2", "Value2", "Number", "2026-02-26 10:01:00"),
-            ("☐", "Sample3", "Value3", "Boolean", "2026-02-26 10:02:00")
+              ("☐", "Sample1", "Value1", "String", "2026-02-26 10:00:00"),
+                ("☐", "Sample1", "Value1", "String", "2026-02-26 10:00:00")
+                
+          
         ]
         
         for data in sample_data:
