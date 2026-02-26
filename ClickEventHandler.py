@@ -1,11 +1,18 @@
 import tkinter as tk
 import datetime
+from typing import TYPE_CHECKING
+
+# Only import for type checking - won't cause runtime errors
+if TYPE_CHECKING:
+    from GridLayoutApp import GridLayoutApp
 
 class ClickEventHandler:
-    def __init__(self, app):
+    def __init__(self, app: 'GridLayoutApp'):
         """Initialize with reference to the main application"""
         self.app = app
-    
+        
+            
+        
     def on_tree_click(self, event):        
         """Handle tree click to toggle checkboxes"""
         region = self.app.tree.identify("region", event.x, event.y)
